@@ -17,10 +17,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -81,11 +79,24 @@ public class UserControllerTest {
 
         List<User> newUsers = Arrays.asList(newUser1, newUser2);
 
-        mockMvc.perform(post("/api/users")  // <-- changed to /api/users
+        mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newUsers)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$", hasSize(2)));
     }
 
+    @Test
+    void testDeleteUserFound() throws Exception {
+        mockMvc.perform(delete("/api/users/{id}", user1.getId())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void testDeleteUserNotFound() throws Exception {
+        mockMvc.perform(delete("/api/users/{id}", 99999L)  // Assuming this ID does not exist
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
 }
