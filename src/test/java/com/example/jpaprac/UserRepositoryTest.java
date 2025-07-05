@@ -18,11 +18,13 @@ public class UserRepositoryTest {
     private TestEntityManager entityManager;
     private User user1;
     private User user2;
+    private User user3;
     @BeforeEach
     void setUp() {
         userRepository.deleteAllInBatch();
         user1 = new User("sai", "sai@example.com");
         user2 = new User("aryan", "aryan@example.com");
+        user3 = new User("Ben", "Ben@example.com");
         entityManager.persist(user1);
         entityManager.persist(user2);
         entityManager.flush();
@@ -41,6 +43,28 @@ public class UserRepositoryTest {
     void testFindByEmailNotFound() {
         Optional<User> foundUser = userRepository.findByEmail("notemail@example.com");
         assertThat(foundUser).isNotPresent();
+
+    }
+    @Test
+    void testSaveUser(){
+        User newUser = new User("Charlie Chaplin", "charlin@example.com");
+        User savedUser = userRepository.save(newUser);
+        assertThat(savedUser).isNotNull();
+        assertThat(savedUser.getId()).isNotNull();
+        assertThat(savedUser.getName()).isEqualTo("Charlie Chaplin");
+    }
+    @Test
+    void testUpdateUser(){
+        String newname = "jaswanth reddy";
+        String newemail = "jaswanthreddy@gmail.com";
+        User user3 = new User("Mahi", "Mahi@example.com");
+        user3.setName(newname);
+        user3.setEmail(newemail);
+        User updatedUser = userRepository.save(user3);
+        assertThat(updatedUser).isNotNull();
+        assertThat(updatedUser.getId()).isNotNull();
+        assertThat(updatedUser.getName()).isEqualTo(newname);
+        assertThat(updatedUser.getEmail()).isEqualTo(newemail);
 
     }
 }
